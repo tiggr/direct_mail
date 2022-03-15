@@ -190,14 +190,21 @@ class JumpurlController implements MiddlewareInterface
         $uid = (int)$uid;
         if ($uid > 0) {
             $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)->getQueryBuilderForTable($table);
-            $res = $queryBuilder->select($fields)
-                ->from($table)
-                ->where(
+            $queryBuilder->select($fields)->from($table);
+           
+            if($table == self::RECIPIENT_TABLE_TTADDRESS) {
+                $queryBuilder->where(
+                    $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT))
+                );
+            }
+            else {
+                $queryBuilder->where(
                     $queryBuilder->expr()->eq('uid', $queryBuilder->createNamedParameter($uid, PDO::PARAM_INT)),
                     $queryBuilder->expr()->eq('deleted', $queryBuilder->createNamedParameter(0))
-                )
-                ->execute();
-
+                );
+            }
+             
+            $res = $queryBuilder->execute();
             $row = $res->fetchAll();
 
             if ($row) {
