@@ -328,7 +328,7 @@ class DmailController extends MainController
                         $data['info']['dmail']['cmd'] = 'send_test';
 
                         // add attachment here, since attachment added in 2nd step
-                        $unserializedMailContent = unserialize(base64_decode($row['mailContent']));
+                        $unserializedMailContent = unserialize(base64_decode((string)$row['mailContent']));
                         $temp = $this->compileQuickMail($row, $unserializedMailContent['plain']['content'] ?? '', false);
                         if ($temp['errorTitle']) {
                             $this->messageQueue->addMessage($this->createFlashMessage($temp['errorText'], $temp['errorTitle'], 2, false));
@@ -1417,7 +1417,7 @@ class DmailController extends MainController
             );
             $this->messageQueue->addMessage($message);
         }
-
+        $sendMailDatetime = date('H:i d-m-Y', time());
         return [
             'id' => $this->id,
             'sys_dmail_uid' => $this->sys_dmail_uid,
@@ -1425,8 +1425,8 @@ class DmailController extends MainController
             'hookSelectDisabled' => $hookSelectDisabled, // put content from hook
             'lastGroup' => $lastGroup,
             'opt' => $opt,
-            'send_mail_datetime_hr' => strftime('%H:%M %d-%m-%Y', time()),
-            'send_mail_datetime' => strftime('%H:%M %d-%m-%Y', time()),
+            'send_mail_datetime_hr' => $sendMailDatetime,
+            'send_mail_datetime' => $sendMailDatetime,
         ];
     }
 
