@@ -28,6 +28,7 @@ return [
                 'max' => '120',
                 'required' => true,
                 'eval' => 'trim',
+                'default' => '',
             ],
         ],
         'description' => [
