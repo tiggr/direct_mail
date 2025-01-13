@@ -121,7 +121,7 @@ class DmQueryGenerator extends DatabaseIntegrityController
         if ($this->formName) {
             $this->setFormName($this->formName);
         }
-        $tmpCode = $this->makeSelectorTable($this->settings, 'query,limit');
+        $tmpCode = $this->makeSelectorTable($this->settings, $GLOBALS['TYPO3_REQUEST'], 'query,limit');
         if ($this->table && is_array($GLOBALS['TCA'][$this->table])) {
             if ($this->settings['search_query_makeQuery']) {
                 // Show query
