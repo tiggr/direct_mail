@@ -347,10 +347,11 @@ final class RecipientListController extends MainController
 
                         if ($table) {
                             $queryGenerator = GeneralUtility::makeInstance(
-                                DmQueryGenerator::class, 
-                                $this->iconFactory, 
-                                GeneralUtility::makeInstance(UriBuilder::class), 
-                                $this->moduleTemplateFactory
+                                DmQueryGenerator::class,
+                                $this->iconFactory,
+                                GeneralUtility::makeInstance(UriBuilder::class),
+                                $this->moduleTemplateFactory,
+                                $this->MOD_SETTINGS
                             );
                             $idLists[$table] = GeneralUtility::makeInstance(TempRepository::class)->getSpecialQueryIdList(
                                 $queryGenerator, 
@@ -706,10 +707,11 @@ final class RecipientListController extends MainController
     protected function specialQuery(): array
     {
         $queryGenerator = GeneralUtility::makeInstance(
-            DmQueryGenerator::class, 
-            $this->iconFactory, 
-            GeneralUtility::makeInstance(UriBuilder::class), 
-            $this->moduleTemplateFactory
+            DmQueryGenerator::class,
+            $this->iconFactory,
+            GeneralUtility::makeInstance(UriBuilder::class),
+            $this->moduleTemplateFactory,
+            $this->MOD_SETTINGS
         );
         //$queryGenerator->setFormName('dmailform');
         $queryGenerator->setFormName('queryform');

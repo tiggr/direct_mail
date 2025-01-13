@@ -16,9 +16,11 @@ namespace DirectMailTeam\DirectMail;
  */
 
 use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Lowlevel\Database\QueryGenerator;
 use TYPO3\CMS\Lowlevel\Controller\DatabaseIntegrityController;
 
 /**
@@ -30,6 +32,15 @@ use TYPO3\CMS\Lowlevel\Controller\DatabaseIntegrityController;
 class DmQueryGenerator extends DatabaseIntegrityController
 {
     protected array $allowedTables = ['tt_address', 'fe_users'];
+
+    public function __construct(
+        protected IconFactory $iconFactory,
+        protected UriBuilder $uriBuilder,
+        protected ModuleTemplateFactory $moduleTemplateFactory,
+        protected array $settings
+    )
+    {
+    }
 
     public function mkTableSelect(string $name, string $cur): string
     {
