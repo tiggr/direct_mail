@@ -35,8 +35,8 @@ class DmQueryGenerator extends DatabaseIntegrityController
 
     public function __construct(
         protected IconFactory $iconFactory,
-        protected UriBuilder $uriBuilder,
-        protected ModuleTemplateFactory $moduleTemplateFactory,
+        protected readonly UriBuilder $uriBuilder,
+        protected readonly ModuleTemplateFactory $moduleTemplateFactory,
         protected array $settings
     )
     {
