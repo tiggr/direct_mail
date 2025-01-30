@@ -77,13 +77,13 @@ class DmQueryGenerator extends DatabaseIntegrityController
         $output = '';
         $selectQueryString = '';
         // Query Maker:
-        $this->init('queryConfig', $this->MOD_SETTINGS['queryTable'] ?? '', '', $this->MOD_SETTINGS);
+        $this->init('queryConfig', $this->settings['queryTable'] ?? '', '', $this->settings);
         if ($this->formName) {
             $this->setFormName($this->formName);
         }
-        $tmpCode = $this->makeSelectorTable($this->MOD_SETTINGS, $request);
+        $tmpCode = $this->makeSelectorTable($this->settings, $request);
         $output .= '<div id="query"></div><h2>Make query</h2><div>' . $tmpCode . '</div>';
-        $mQ = $this->MOD_SETTINGS['search_query_makeQuery'] ?? '';
+        $mQ = $this->settings['search_query_makeQuery'] ?? '';
 
         // Make form elements:
         if ($this->table && is_array($GLOBALS['TCA'][$this->table])) {
