@@ -100,7 +100,7 @@ class DmQueryGenerator extends DatabaseIntegrityController
                     $fullQueryString = $selectQueryString;
                     $dataRows = $connection->executeQuery($selectQueryString)->fetchAllAssociative();
                     //$output .= '<h2>SQL query</h2><div><code>' . htmlspecialchars($fullQueryString) . '</code></div>';
-                    $cPR = $this->getQueryResultCode($mQ, $dataRows, $this->table);
+                    $cPR = $this->getQueryResultCode($mQ, $dataRows, $this->table, $request);
                     $output .= '<h2>' . ($cPR['header'] ?? '') . '</h2><div>' . $cPR['content'] . '</div>';
                 } catch (DBALException $e) {
                     $output .= '<h2>SQL query</h2><div><code>' . htmlspecialchars($fullQueryString) . '</code></div>';
