@@ -1,4 +1,6 @@
-<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers"
+      data-namespace-typo3-fluid="true">
 
 <f:layout name="Module" />
 
@@ -213,13 +215,15 @@
 					<br>
 					<div class="form-control-wrap">
 						<div class="input-group">
-							<input class="form-control form-control-clearable t3js-datetimepicker t3js-clearable"
+                            <f:variable name="formatted"><f:if condition="{data.final.finalForm.send_mail_datetime}">{f:format.date(format: dateFormat, date: data.final.finalForm.send_mail_datetime)}</f:if></f:variable>
+                            <input class="form-control form-control-clearable t3js-datetimepicker t3js-clearable"
 								data-date-type="datetime"
 								data-date-offset="0"
 								type="text"
 								id="tceforms-datetimefield-startdate"
-								name="send_mail_datetime_hr" value="{data.final.finalForm.send_mail_datetime_hr}">
-							<input name="send_mail_datetime" value="{data.final.finalForm.send_mail_datetime}" type="hidden">
+								name="send_mail_datetime"
+                                value="{formatted}"
+                            />
                             <button class="btn btn-default" type="button" data-global-event="click" data-action-focus="#tceforms-datetimefield-startdate">
                                 <core:icon identifier="actions-edit-pick-date" />
                             </button>

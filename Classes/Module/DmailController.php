@@ -139,6 +139,7 @@ final class DmailController extends MainController
         $normalizedParams = $request->getAttribute('normalizedParams');
 
         $this->pageRenderer->loadJavaScriptModule('@typo3/backend/date-time-picker.js');
+        $this->pageRenderer->loadJavaScriptModule('@directmailteam/directmail/DatepickerInit.js');
 
         $this->requestUri = $normalizedParams->getRequestUri();
 
