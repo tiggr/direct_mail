@@ -3,7 +3,7 @@
 return [
     'dependencies' => ['core', 'backend'],
     'imports' => [
-        '@directmailteam/diractmail/' => [
+        '@directmailteam/directmail/' => [
             'path' => 'EXT:direct_mail/Resources/Public/JavaScript/',
         ],
     ],
