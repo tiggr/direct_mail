@@ -101,7 +101,7 @@ final class DmailController extends MainController
         protected bool $mailingModeMailGroup = false,
         protected string $requestUri = '',
         protected string $queryConfig = '',
-        protected string $sendMailDatetimeHr = '',
+        protected string $sendMailDatetime = '',
         protected bool $testmail = false,
         protected bool $savedraft = false,
         protected array $set = [],
@@ -177,6 +177,7 @@ final class DmailController extends MainController
         $this->mailingModeMailGroup = (bool)($parsedBody['mailingMode_mailGroup'] ?? $queryParams['mailingMode_mailGroup'] ?? false);
         $this->queryConfig = (string)($parsedBody['queryConfig'] ?? $queryParams['queryConfig'] ?? '');
         $this->sendMailDatetimeHr = (string)($parsedBody['send_mail_datetime_hr'] ?? $queryParams['send_mail_datetime_hr'] ?? '');
+        $this->sendMailDatetime = (string)($parsedBody['send_mail_datetime'] ?? $queryParams['send_mail_datetime'] ?? '');
         $this->testmail = (bool)($parsedBody['testmail'] ?? $queryParams['testmail'] ?? false);
         $this->savedraft = (bool)($parsedBody['savedraft'] ?? $queryParams['savedraft'] ?? false);
         $this->set = is_array($parsedBody['SET'] ?? '') ? $parsedBody['SET'] : [];
@@ -194,6 +195,7 @@ final class DmailController extends MainController
         // get the config from pageTS
         $this->params['pid'] = $this->id;
         $this->cshTable = '_MOD_' . $this->moduleName;
+        $view->assign('dateFormat', 'Y-m-d\TH:i:sp');
 
         if (($this->id && $this->access) || ($this->isAdmin() && !$this->id)) {
 
@@ -1277,7 +1279,7 @@ final class DmailController extends MainController
                 $result = $this->cmd_compileMailGroup($recipientGroups);
                 $queryInfo = $result['queryInfo'];
 
-                $distributionTime = strtotime($this->sendMailDatetimeHr);
+                $distributionTime = strtotime($this->sendMailDatetime);
                 if ($distributionTime < time()) {
                     $distributionTime = time();
                 }
