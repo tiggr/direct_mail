@@ -171,9 +171,9 @@ final class StatisticsController extends MainController
 
                     $itemsPerPage = 100; //@TODO
                     $paginator = GeneralUtility::makeInstance(
-                        ArrayPaginator::class, 
-                        $data['dataPageInfo'] ?? [], 
-                        $this->currentPageNumber, 
+                        ArrayPaginator::class,
+                        $data['dataPageInfo'] ?? [],
+                        $this->currentPageNumber,
                         $itemsPerPage
                     );
 
@@ -1615,8 +1615,8 @@ final class StatisticsController extends MainController
     public function getLinkLabel(
         string $url,
         string $urlStr,
-        bool $forceFetch = false,
-        string $linkedWord = ''): string
+        ?bool $forceFetch = false,
+        ?string $linkedWord = ''): ?string
     {
         $pathSite = $this->getBaseURL();
         $label = $linkedWord;
