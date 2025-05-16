@@ -74,7 +74,7 @@ final class RecipientListController extends MainController
         protected array $allowedTables = ['tt_adress', 'fe_users'],
 
         protected bool $submit = false,
-        protected string $queryConfig = '',
+        protected $queryConfig = [],
     ) {
     }
 
@@ -107,7 +107,7 @@ final class RecipientListController extends MainController
         $this->indata = $parsedBody['indata'] ?? $this->queryParams['indata'] ?? [];
         $this->submit = (bool)($parsedBody['submit'] ?? $this->queryParams['submit'] ?? false);
 
-        $this->queryConfig = (string)($parsedBody['queryConfig'] ?? $this->queryParams['queryConfig'] ?? '');
+        $this->queryConfig = $parsedBody['queryConfig'] ?? $this->queryParams['queryConfig'] ?? [];
 
         $moduleTemplate = $this->moduleTemplateFactory->create($request);
         return $this->indexAction($moduleTemplate);
