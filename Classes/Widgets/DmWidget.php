@@ -4,25 +4,26 @@ declare(strict_types=1);
 
 namespace DirectMailTeam\DirectMail\Widgets;
 
-
 use DirectMailTeam\DirectMail\Widgets\Provider\DmProvider;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Psr\Http\Message\ServerRequestInterface;
+use TYPO3\CMS\Backend\View\BackendViewFactory;
+use TYPO3\CMS\Dashboard\Widgets\RequestAwareWidgetInterface;
 use TYPO3\CMS\Dashboard\Widgets\WidgetConfigurationInterface;
 use TYPO3\CMS\Dashboard\Widgets\WidgetInterface;
-use TYPO3\CMS\Fluid\View\StandaloneView;
 
-
-class DmWidget implements WidgetInterface
+class DmWidget implements WidgetInterface, RequestAwareWidgetInterface
 {
+    private ServerRequestInterface $request;
+
     /**
      * @var WidgetConfigurationInterface
      */
     private $configuration;
 
     /**
-     * @var StandaloneView
+     * @var BackendViewFactory
      */
-    private $view;
+    private $backendViewFactory;
 
     /**
      * @var DmProvider
@@ -37,24 +38,29 @@ class DmWidget implements WidgetInterface
     public function __construct(
         WidgetConfigurationInterface $configuration,
         DmProvider $dataProvider,
-        StandaloneView $view,
+        BackendViewFactory $backendViewFactory,
         array $options = []
     ) {
         $this->configuration = $configuration;
         $this->dataProvider = $dataProvider;
-        $this->view = $view;
+        $this->backendViewFactory = $backendViewFactory;
         $this->options = $options;
+    }
+
+    public function setRequest(ServerRequestInterface $request): void
+    {
+        $this->request = $request;
     }
 
     public function renderWidgetContent(): string
     {
-        $this->view->setTemplate('DmWidget');
-        $this->view->assignMultiple([
+        $view = $this->backendViewFactory->create($this->request, ['directmailteam/direct-mail']);
+        $view->assignMultiple([
             'items' => $this->dataProvider->getDmPages(),
             'options' => $this->options,
             'configuration' => $this->configuration,
         ]);
-        return $this->view->render();
+        return $view->render('Dashboard/Widgets/DmWidget');
     }
 
     public function getOptions(): array

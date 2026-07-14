@@ -49,12 +49,12 @@ class FetchUtility
 
     public function getContents(string $url): string
     {
-        try  {
+        try {
             $respose = $this->getResponse($url);
             $content = (string)$respose->getBody()->getContents();
             // remove all <script> tags from content
-            return preg_replace('/<script[^>]*>.*?<\/script>/is', '', $content);
-        } catch(\Exception $e) {
+            return preg_replace('/<script[^>]*>.*?<\/script>/is', '', $content) ?? $content;
+        } catch (\Exception) {
         }
         return '';
     }
