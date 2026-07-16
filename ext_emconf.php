@@ -21,8 +21,6 @@ $EM_CONF[$_EXTKEY] = [
         'suggests' => [
         ],
     ],
-    'suggests' => [
-    ],
     'autoload' => [
         'psr-4' => [
             'DirectMailTeam\\DirectMail\\' => 'Classes/',

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace DirectMailTeam\DirectMail\Widgets\Provider;
@@ -18,13 +19,13 @@ class DmMailEngineStatusDataProvider implements ChartDataProviderInterface
         $countScheduled = 0;
         $countNotScheduled = 0;
         if (count($pages) !== 0) {
-            foreach($pages as $page) {
+            foreach ($pages as $page) {
                 $res = GeneralUtility::makeInstance(SysDmailRepository::class)->countSysDmailsByPid($page['uid'], true);
-                if(isset($res['count'])) {
+                if (isset($res['count'])) {
                     $countScheduled += $res['count'];
                 }
                 $res = GeneralUtility::makeInstance(SysDmailRepository::class)->countSysDmailsByPid($page['uid'], false);
-                if(isset($res['count'])) {
+                if (isset($res['count'])) {
                     $countNotScheduled += $res['count'];
                 }
             }
@@ -34,8 +35,8 @@ class DmMailEngineStatusDataProvider implements ChartDataProviderInterface
 
         return [
             'labels' => [
-                $this->getLanguageService()->sL('LLL:EXT:direct_mail/Resources/Private/Language/locallang.xlf:widgets.dm.label.sent'). ': ' . $countScheduled,
-                $this->getLanguageService()->sL('LLL:EXT:direct_mail/Resources/Private/Language/locallang.xlf:widgets.dm.label.unsent'). ': ' . $countNotScheduled,
+                $this->getLanguageService()->sL('LLL:EXT:direct_mail/Resources/Private/Language/locallang.xlf:widgets.dm.label.sent') . ': ' . $countScheduled,
+                $this->getLanguageService()->sL('LLL:EXT:direct_mail/Resources/Private/Language/locallang.xlf:widgets.dm.label.unsent') . ': ' . $countNotScheduled,
             ],
             'datasets' => [
                 [
@@ -54,4 +55,3 @@ class DmMailEngineStatusDataProvider implements ChartDataProviderInterface
         return $GLOBALS['LANG'];
     }
 }
-

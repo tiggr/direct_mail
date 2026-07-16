@@ -4,6 +4,7 @@ namespace DirectMailTeam\DirectMail\Command;
 
 use DirectMailTeam\DirectMail\Repository\SysDmailMaillogRepository;
 use DirectMailTeam\DirectMail\Utility\ReadmailUtility;
+use Doctrine\DBAL\DBALException;
 use Fetch\Server;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -195,7 +196,7 @@ class AnalyzeBounceMailCommand extends Command
                     (int)$cp['reason'],
                     serialize($cp)
                 );
-            } catch (\Doctrine\DBAL\DBALException $e) {
+            } catch (DBALException) {
                 // Log $e->getMessage();
                 return false;
             }

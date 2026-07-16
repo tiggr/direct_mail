@@ -8,23 +8,16 @@ use DirectMailTeam\DirectMail\Utility\TsUtility;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Backend\Attribute\Controller;
-use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Http\HtmlResponse;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
-use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Page\PageRenderer;
-use TYPO3\CMS\Core\Imaging\IconFactory;
-use DirectMailTeam\DirectMail\Repository\PagesRepository;
-use TYPO3\CMS\Backend\Routing\UriBuilder;
-use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class ConfigurationController extends MainController
 {
@@ -34,13 +27,10 @@ final class ConfigurationController extends MainController
         protected readonly ModuleTemplateFactory $moduleTemplateFactory,
         protected readonly IconFactory $iconFactory,
         protected readonly PageRenderer $pageRenderer,
-
         protected readonly string $moduleName = 'directmail_module_configuration',
         protected readonly string $TSconfPrefix = 'mod.web_modules.dmail.',
         protected readonly string $lllFile = 'LLL:EXT:direct_mail/Resources/Private/Language/locallang_mod2-6.xlf',
-
         protected ?LanguageService $languageService = null,
-
         protected array $pageTS = [],
         protected bool $submit = false,
         protected array $implodedParams = [],
@@ -68,8 +58,8 @@ final class ConfigurationController extends MainController
         $this->pageTS = $parsedBody['pageTS'] ?? $queryParams['pageTS'] ?? [];
         $this->submit = isset($parsedBody['submit']) ? true : false;
 
-        foreach(['includeMedia', 'flowedFormat', 'use_rdct', 'long_link_mode', 'enable_jump_url', 'jumpurl_tracking_privacy', 'enable_mailto_jump_url', 'showContentTitle', 'prependContentTitle'] as $checkboxName) {
-            if(!isset($this->pageTS[$checkboxName])) {
+        foreach (['includeMedia', 'flowedFormat', 'use_rdct', 'long_link_mode', 'enable_jump_url', 'jumpurl_tracking_privacy', 'enable_mailto_jump_url', 'showContentTitle', 'prependContentTitle'] as $checkboxName) {
+            if (!isset($this->pageTS[$checkboxName])) {
                 $this->pageTS[$checkboxName] = '0';
             }
         }
@@ -86,7 +76,6 @@ final class ConfigurationController extends MainController
         $this->pageRenderer->loadRequireJs();
         $this->pageRenderer->loadJavaScriptModule('@directmailteam/directmail/Configuration.js');
         if (($this->id && $this->access) || ($this->isAdmin() && !$this->id)) {
-
             $module = $this->getModulName();
 
             if ($module == 'dmail') {
@@ -161,8 +150,8 @@ final class ConfigurationController extends MainController
 
 
 
-                foreach(['includeMedia', 'flowedFormat', 'use_rdct', 'long_link_mode', 'enable_jump_url', 'jumpurl_tracking_privacy', 'enable_mailto_jump_url', 'showContentTitle', 'prependContentTitle'] as $checkboxName) {
-                    if(!isset($this->pageTS[$checkboxName])) {
+                foreach (['includeMedia', 'flowedFormat', 'use_rdct', 'long_link_mode', 'enable_jump_url', 'jumpurl_tracking_privacy', 'enable_mailto_jump_url', 'showContentTitle', 'prependContentTitle'] as $checkboxName) {
+                    if (!isset($this->pageTS[$checkboxName])) {
                         $this->pageTS[$checkboxName] = '0';
                     }
                 }
@@ -175,8 +164,7 @@ final class ConfigurationController extends MainController
                 if ($done) {
                     $title = $this->languageService->sL($this->lllFile . ':mod.configuration.saved.title');
                     $message = $this->languageService->sL($this->lllFile . ':mod.configuration.saved');
-                }
-                else {
+                } else {
                     $title = $this->languageService->sL($this->lllFile . ':mod.configuration.not_saved');
                     $message = $this->languageService->sL($this->lllFile . ':mod.configuration.not_saved.title');
                 }
@@ -189,7 +177,6 @@ final class ConfigurationController extends MainController
                     'type' => $done
                 ]], JSON_THROW_ON_ERROR));
                 return $response;
-
             }
         }
     }
@@ -207,20 +194,20 @@ final class ConfigurationController extends MainController
         }
     }
 
-   /**
-     * Update the pageTS
-     * No return value: sent header to the same page
-     */
+    /**
+      * Update the pageTS
+      * No return value: sent header to the same page
+      */
     protected function updatePageTS(): void
     {
         if ($this->getBackendUser()->doesUserHaveAccess(BackendUtility::getRecord('pages', $this->id), 2)) {
             if (is_array($this->pageTS) && count($this->pageTS)) {
                 $notificationQueue = $this->getFlashMessageQueue(FlashMessageQueue::NOTIFICATION_QUEUE);
                 $done = false;
-                if($this->submit) {
+                if ($this->submit) {
                     $done = GeneralUtility::makeInstance(TsUtility::class)->updatePagesTSconfig($this->id, $this->pageTS, $this->TSconfPrefix);
                 }
-                if($this->submit && $done) {
+                if ($this->submit && $done) {
                     $message = $this->createFlashMessage(
                         $this->languageService->sL($this->lllFile . ':mod.configuration.saved'),
                         $this->languageService->sL($this->lllFile . ':mod.configuration.saved.title'),
@@ -228,8 +215,7 @@ final class ConfigurationController extends MainController
                         false
                     );
                     $notificationQueue->enqueue($message);
-                }
-                elseif($this->submit && !$done) {
+                } elseif ($this->submit && !$done) {
                     $message = $this->createFlashMessage(
                         $this->languageService->sL($this->lllFile . ':mod.configuration.not_saved'),
                         $this->languageService->sL($this->lllFile . ':mod.configuration.not_saved.title'),

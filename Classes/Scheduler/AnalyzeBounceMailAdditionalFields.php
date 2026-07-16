@@ -14,10 +14,9 @@ namespace DirectMailTeam\DirectMail\Scheduler;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 use Fetch\Server;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Scheduler\AbstractAdditionalFieldProvider;
 use TYPO3\CMS\Scheduler\Controller\SchedulerModuleController;
@@ -57,8 +56,8 @@ class AnalyzeBounceMailAdditionalFields extends AbstractAdditionalFieldProvider
 
         if ($task) {
             $serviceHTML = '<select name="tx_scheduler[bounceService]" id="bounceService">' .
-                '<option value="imap" ' . ($task->getService() === 'imap'? 'selected="selected"' : '') . '>IMAP</option>' .
-                '<option value="pop3" ' . ($task->getService() === 'pop3'? 'selected="selected"' : '') . '>POP3</option>' .
+                '<option value="imap" ' . ($task->getService() === 'imap' ? 'selected="selected"' : '') . '>IMAP</option>' .
+                '<option value="pop3" ' . ($task->getService() === 'pop3' ? 'selected="selected"' : '') . '>POP3</option>' .
                 '</select>';
         } else {
             $serviceHTML = '<select name="tx_scheduler[bounceService]" id="bounceService">' .
@@ -108,7 +107,7 @@ class AnalyzeBounceMailAdditionalFields extends AbstractAdditionalFieldProvider
             // check if we can connect using the given data
             /** @var Server $mailServer */
             $mailServer = GeneralUtility::makeInstance(
-                \Fetch\Server::class,
+                Server::class,
                 $submittedData['bounceServer'],
                 (int)$submittedData['bouncePort'],
                 $submittedData['bounceService']
@@ -123,14 +122,14 @@ class AnalyzeBounceMailAdditionalFields extends AbstractAdditionalFieldProvider
                 $this->addMessage(
                     $this->getLanguangeService()->sL('LLL:EXT:direct_mail/Resources/Private/Language/locallang_mod2-6.xlf:scheduler.bounceMail.dataVerification') .
                     $e->getMessage(),
-                    FlashMessage::ERROR
+                    ContextualFeedbackSeverity::ERROR
                 );
                 $return = false;
             }
         } else {
             $this->addMessage(
                 $this->getLanguangeService()->sL('LLL:EXT:direct_mail/Resources/Private/Language/locallang_mod2-6.xlf:scheduler.bounceMail.phpImapError'),
-                FlashMessage::ERROR
+                ContextualFeedbackSeverity::ERROR
             );
             $return = false;
         }
@@ -142,9 +141,9 @@ class AnalyzeBounceMailAdditionalFields extends AbstractAdditionalFieldProvider
     {
         // create server input field
         return [
-            'code'     => $fieldHTML,
-            'label'    => $this->getLanguangeService()->sL('LLL:EXT:direct_mail/Resources/Private/Language/locallang_mod2-6.xlf:scheduler.bounceMail.' . $fieldName),
-            'cshKey'   => $fieldName,
+            'code' => $fieldHTML,
+            'label' => $this->getLanguangeService()->sL('LLL:EXT:direct_mail/Resources/Private/Language/locallang_mod2-6.xlf:scheduler.bounceMail.' . $fieldName),
+            'cshKey' => $fieldName,
             'cshLabel' => $this->getLanguangeService()->sL('LLL:EXT:direct_mail/Resources/Private/Language/locallang_mod2-6.xlf:scheduler.bounceMail.csh.' . $fieldName),
         ];
     }

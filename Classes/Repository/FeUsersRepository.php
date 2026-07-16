@@ -8,10 +8,10 @@ use TYPO3\CMS\Core\Database\Connection;
 
 class FeUsersRepository extends MainRepository
 {
-    protected string $table                        = 'fe_users';
-    protected string $tablePages                   = 'pages';
-    protected string $tableSysDmailGroup           = 'sys_dmail_group';
-    protected string $tableSysDmailGroupMm         = 'sys_dmail_group_mm';
+    protected string $table = 'fe_users';
+    protected string $tablePages = 'pages';
+    protected string $tableSysDmailGroup = 'sys_dmail_group';
+    protected string $tableSysDmailGroupMm = 'sys_dmail_group_mm';
     protected string $tableSysDmailGroupCategoryMm = 'sys_dmail_group_category_mm';
 
     /**
@@ -50,7 +50,7 @@ class FeUsersRepository extends MainRepository
         ->fetchAllAssociative();
     }
 
-        /**
+    /**
      * Returns record no matter what - except if record is deleted
      *
      * @param int $uid The uid to look up in $table
@@ -85,13 +85,13 @@ class FeUsersRepository extends MainRepository
         return 0;
     }
 
-     /**
-     * Return all uid's from 'fe_users' for a static direct mail group.
-     *
-     * @param int $uid The uid of the direct_mail group
-     *
-     * @return array The resulting array of uid's
-     */
+    /**
+    * Return all uid's from 'fe_users' for a static direct mail group.
+    *
+    * @param int $uid The uid of the direct_mail group
+    *
+    * @return array The resulting array of uid's
+    */
     public function getStaticIdList(int $uid): array
     {
         $queryBuilder = $this->getQueryBuilder($this->table);

@@ -1,4 +1,5 @@
 <?php
+
 //https://docs.typo3.org/m/typo3/reference-coreapi/main/en-us/ExtensionArchitecture/HowTo/BackendModule/ModuleConfiguration.html
 use DirectMailTeam\DirectMail\Module\ConfigurationController;
 use DirectMailTeam\DirectMail\Module\DmailController;
@@ -11,7 +12,7 @@ return [
     'directmail' => [
         'labels' => 'LLL:EXT:direct_mail/Resources/Private/Language/locallangNavFrame.xlf',
         'iconIdentifier' => 'directmail-module',
-        'navigationComponent' => '@typo3/backend/page-tree/page-tree-element',
+        'navigationComponent' => '@typo3/backend/tree/page-tree-element',
         //'navigationComponent' => 'TYPO3/CMS/Backend/PageTree/PageTreeElement',
     ],
     'directmail_module_directmail' => [
@@ -99,4 +100,3 @@ return [
         ],
     ],
 ];
-

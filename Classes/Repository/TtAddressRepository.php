@@ -12,10 +12,10 @@ use TYPO3\CMS\Core\Utility\VersionNumberUtility;
 
 class TtAddressRepository extends MainRepository
 {
-    protected string $table                        = 'tt_address';
-    protected string $tablePages                   = 'pages';
-    protected string $tableSysDmailGroup           = 'sys_dmail_group';
-    protected string $tableSysDmailGroupMm         = 'sys_dmail_group_mm';
+    protected string $table = 'tt_address';
+    protected string $tablePages = 'pages';
+    protected string $tableSysDmailGroup = 'sys_dmail_group';
+    protected string $tableSysDmailGroupMm = 'sys_dmail_group_mm';
     protected string $tableSysDmailGroupCategoryMm = 'sys_dmail_group_category_mm';
 
     /**
@@ -210,7 +210,7 @@ class TtAddressRepository extends MainRepository
         return 0;
     }
 
-        /**
+    /**
      * Return all uid's from 'tt_address' for a static direct mail group.
      *
      * @param int $uid The uid of the direct_mail group

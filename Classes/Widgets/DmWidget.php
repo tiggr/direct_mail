@@ -15,36 +15,8 @@ class DmWidget implements WidgetInterface, RequestAwareWidgetInterface
 {
     private ServerRequestInterface $request;
 
-    /**
-     * @var WidgetConfigurationInterface
-     */
-    private $configuration;
-
-    /**
-     * @var BackendViewFactory
-     */
-    private $backendViewFactory;
-
-    /**
-     * @var DmProvider
-    */
-    private $dataProvider;
-
-    /**
-     * @var array
-     */
-    private $options;
-
-    public function __construct(
-        WidgetConfigurationInterface $configuration,
-        DmProvider $dataProvider,
-        BackendViewFactory $backendViewFactory,
-        array $options = []
-    ) {
-        $this->configuration = $configuration;
-        $this->dataProvider = $dataProvider;
-        $this->backendViewFactory = $backendViewFactory;
-        $this->options = $options;
+    public function __construct(private readonly WidgetConfigurationInterface $configuration, private readonly DmProvider $dataProvider, private readonly BackendViewFactory $backendViewFactory, private readonly array $options = [])
+    {
     }
 
     public function setRequest(ServerRequestInterface $request): void

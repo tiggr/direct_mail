@@ -7,43 +7,32 @@ namespace DirectMailTeam\DirectMail\Module;
 use DirectMailTeam\DirectMail\Dmailer;
 use DirectMailTeam\DirectMail\Repository\SysDmailMaillogRepository;
 use DirectMailTeam\DirectMail\Repository\SysDmailRepository;
-use DirectMailTeam\DirectMail\Repository\PagesRepository;
 use DirectMailTeam\DirectMail\Utility\SchedulerUtility;
-use DirectMailTeam\DirectMail\Utility\Typo3ConfVarsUtility;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Backend\Attribute\Controller;
-use TYPO3\CMS\Backend\Routing\UriBuilder;
-use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
+use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\Http\HtmlResponse;
-use TYPO3\CMS\Core\Http\Uri;
-use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Localization\LanguageService;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Pagination\ArrayPaginator;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 final class MailerEngineController extends MainController
 {
-
     protected FlashMessageQueue $flashMessageQueue;
 
     public function __construct(
         protected readonly ModuleTemplateFactory $moduleTemplateFactory,
         protected readonly IconFactory $iconFactory,
-
         protected readonly string $moduleName = 'directmail_module_mailerengine',
         protected readonly string $lllFile = 'LLL:EXT:direct_mail/Resources/Private/Language/locallang_mod2-6.xlf',
-
         protected ?LanguageService $languageService = null,
-
         protected array $pageinfo = [],
         protected int $id = 0,
         protected int $uid = 0, //for cmd == 'delete'
@@ -81,7 +70,6 @@ final class MailerEngineController extends MainController
     public function indexAction(ModuleTemplate $view): ResponseInterface
     {
         if (($this->id && $this->access) || ($this->isAdmin() && !$this->id)) {
-
             $module = $this->getModulName();
 
             if ($module == 'dmail') {
@@ -95,9 +83,9 @@ final class MailerEngineController extends MainController
 
                     $itemsPerPage = 100; //@TODO
                     $paginator = GeneralUtility::makeInstance(
-                        ArrayPaginator::class, 
-                        $mailerEngine['data'], 
-                        $this->currentPageNumber, 
+                        ArrayPaginator::class,
+                        $mailerEngine['data'],
+                        $this->currentPageNumber,
                         $itemsPerPage
                     );
                      
@@ -112,7 +100,7 @@ final class MailerEngineController extends MainController
                                 'keyOfFirstPaginatedItem' => $paginator->getKeyOfFirstPaginatedItem(),
                                 'keyOfLastPaginatedItem' => $paginator->getKeyOfLastPaginatedItem(),
                                 'paginatedItems' => $paginator->getPaginatedItems(),
-                                'links' =>  array_fill(0, $paginator->getNumberOfPages(), '')
+                                'links' => array_fill(0, $paginator->getNumberOfPages(), '')
                             ],
                             'id' => $this->id,
                             'invoke' => $mailerEngine['invoke'],
@@ -180,7 +168,7 @@ final class MailerEngineController extends MainController
         $moduleUrl = '';
 
         // enable manual invocation of mailer engine; enabled by default
-        $enableTrigger = ! (isset($this->params['menu.']['dmail_mode.']['mailengine.']['disable_trigger']) && $this->params['menu.']['dmail_mode.']['mailengine.']['disable_trigger']);
+        $enableTrigger = !(isset($this->params['menu.']['dmail_mode.']['mailengine.']['disable_trigger']) && $this->params['menu.']['dmail_mode.']['mailengine.']['disable_trigger']);
 
         if ($enableTrigger && $this->invokeMailerEngine) {
             $this->invokeMEngine();
@@ -211,14 +199,14 @@ final class MailerEngineController extends MainController
         if (is_array($rows)) {
             foreach ($rows as $row) {
                 $data[] = [
-                    'uid'             => $row['uid'],
-                    'icon'            => $this->iconFactory->getIconForRecord('sys_dmail', $row, Icon::SIZE_SMALL)->render(),
-                    'subject'         => $this->linkDMailRecord(htmlspecialchars(GeneralUtility::fixed_lgd_cs($row['subject'], 100)), $row['uid']),
-                    'scheduled'       => BackendUtility::datetime($row['scheduled']),
+                    'uid' => $row['uid'],
+                    'icon' => $this->iconFactory->getIconForRecord('sys_dmail', $row, IconSize::SMALL)->render(),
+                    'subject' => $this->linkDMailRecord(htmlspecialchars(GeneralUtility::fixed_lgd_cs($row['subject'], 100)), $row['uid']),
+                    'scheduled' => BackendUtility::datetime($row['scheduled']),
                     'scheduled_begin' => $row['scheduled_begin'] ? BackendUtility::datetime($row['scheduled_begin']) : '',
-                    'scheduled_end'   => $row['scheduled_end'] ? BackendUtility::datetime($row['scheduled_end']) : '',
-                    'sent'            => $this->getSysDmailMaillogsCountres($row['uid']),
-                    'delete'          => $this->canDelete($row['uid']),
+                    'scheduled_end' => $row['scheduled_end'] ? BackendUtility::datetime($row['scheduled_end']) : '',
+                    'sent' => $this->getSysDmailMaillogsCountres($row['uid']),
+                    'delete' => $this->canDelete($row['uid']),
                 ];
             }
         }

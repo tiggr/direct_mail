@@ -62,11 +62,11 @@ class DmCsvUtility
             $fieldOrder = [];
 
             foreach ($first as $v) {
-                list($fName, $fConf) = preg_split('|[\[\]]|', $v);
+                [$fName, $fConf] = preg_split('|[\[\]]|', (string) $v);
                 $fName = trim($fName);
                 $fConf = trim($fConf);
                 $fieldOrder[] = [$fName, $fConf];
-                if ($fName && substr($fName, 0, 5) != 'user_' && !in_array($fName, $fieldListArr)) {
+                if ($fName && !str_starts_with($fName, 'user_') && !in_array($fName, $fieldListArr)) {
                     $fieldName = 0;
                     break;
                 }
@@ -96,9 +96,9 @@ class DmCsvUtility
                             if ($fN[1]) {
                                 // If is true
                                 if (trim($data[$kk])) {
-                                    if (substr($fN[1], 0, 1) == '=') {
+                                    if (str_starts_with($fN[1], '=')) {
                                         $out[$c][$fN[0]] = trim(substr($fN[1], 1));
-                                    } elseif (substr($fN[1], 0, 1) == '+') {
+                                    } elseif (str_starts_with($fN[1], '+')) {
                                         $out[$c][$fN[0]] += substr($fN[1], 1);
                                     }
                                 }

@@ -16,7 +16,6 @@ namespace DirectMailTeam\DirectMail\Middleware;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 use DirectMailTeam\DirectMail\Repository\FeUsersRepository;
 use DirectMailTeam\DirectMail\Repository\SysDmailMaillogRepository;
 use DirectMailTeam\DirectMail\Repository\SysDmailRepository;
@@ -28,6 +27,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Crypto\HashService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 
@@ -86,7 +86,7 @@ class JumpurlController implements MiddlewareInterface
         if ($this->shouldProcess()) {
             $mailId = (int)$this->request->getQueryParams()['mid'];
             $submittedRecipient = isset($this->request->getQueryParams()['rid']) ? (string)$this->request->getQueryParams()['rid'] : '';
-            $submittedAuthCode  = $this->request->getQueryParams()['aC'] ?? '';
+            $submittedAuthCode = $this->request->getQueryParams()['aC'] ?? '';
             $jumpurl = $this->request->getQueryParams()['jumpurl'] ?? '';
 
             $urlId = 0;
@@ -130,13 +130,13 @@ class JumpurlController implements MiddlewareInterface
 
             if ($this->responseType !== 0) {
                 $mailLogParams = [
-                    'mid'           => $mailId,
-                    'tstamp'        => time(),
-                    'url'           => $jumpurl,
+                    'mid' => $mailId,
+                    'tstamp' => time(),
+                    'url' => $jumpurl,
                     'response_type' => $this->responseType,
-                    'url_id'        => (int)$urlId,
-                    'rtbl'          => mb_substr($this->recipientTable, 0, 1),
-                    'rid'           => $rid ?? $submittedAuthCode,
+                    'url_id' => (int)$urlId,
+                    'rtbl' => mb_substr($this->recipientTable, 0, 1),
+                    'rid' => $rid ?? $submittedAuthCode,
                 ];
                 $sysDmailMaillogRepository = GeneralUtility::makeInstance(SysDmailMaillogRepository::class);
                 if ($sysDmailMaillogRepository->hasRecentLog($mailLogParams) === false) {
@@ -191,7 +191,7 @@ class JumpurlController implements MiddlewareInterface
                 ['allowed_classes' => false]
             );
 
-            if(is_array($mailContent)) {
+            if (is_array($mailContent)) {
                 if ($targetIndex >= 0) {
                     // Link (number)
                     $this->responseType = self::RESPONSE_TYPE_HREF;
@@ -202,7 +202,7 @@ class JumpurlController implements MiddlewareInterface
                     $targetUrl = $mailContent['plain']['link_ids'][abs($targetIndex)];
                 }
             }
-            $targetUrl = htmlspecialchars_decode(urldecode($targetUrl));
+            $targetUrl = htmlspecialchars_decode(urldecode((string) $targetUrl));
         }
         return $targetUrl;
     }
@@ -219,7 +219,7 @@ class JumpurlController implements MiddlewareInterface
         $recipientTable = '';
         $recipientUid = 0;
         if (!empty($combinedRecipient)) {
-            list($recipientTable, $recipientUid) = explode('_', $combinedRecipient);
+            [$recipientTable, $recipientUid] = explode('_', $combinedRecipient);
         }
 
         switch ($recipientTable) {
@@ -325,7 +325,7 @@ class JumpurlController implements MiddlewareInterface
      */
     protected function calculateJumpUrlHash(string $targetUrl): string
     {
-        return GeneralUtility::hmac($targetUrl, 'jumpurl');
+        return GeneralUtility::makeInstance(HashService::class)->hmac($targetUrl, 'jumpurl');
     }
 
     /**

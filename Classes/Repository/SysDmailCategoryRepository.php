@@ -8,7 +8,7 @@ use TYPO3\CMS\Core\Database\Connection;
 
 class SysDmailCategoryRepository extends MainRepository
 {
-    protected string $table                            = 'sys_dmail_category';
+    protected string $table = 'sys_dmail_category';
     protected string $tableSysDmailTtcontentCategoryMm = 'sys_dmail_ttcontent_category_mm';
 
     /**

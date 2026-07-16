@@ -92,7 +92,7 @@ class ReadmailUtility
         if (strstr($content, 'X-TYPO3MID:')) {
             $p = explode('X-TYPO3MID:', $content, 2);
             $l = explode(LF, $p[1], 2);
-            list($mid, $hash) = GeneralUtility::trimExplode('-', $l[0]);
+            [$mid, $hash] = GeneralUtility::trimExplode('-', $l[0]);
             if (md5($mid) == $hash) {
                 $moreParts = explode('_', substr($mid, 3));
                 $out = [
@@ -194,7 +194,7 @@ class ReadmailUtility
         foreach ($parts as $ppstr) {
             $mparts = explode('=', $ppstr, 2);
             if (count($mparts) > 1) {
-                $cTypes[strtolower(trim($mparts[0]))] = preg_replace('/^"/', '', trim(preg_replace('/"$/', '', trim($mparts[1]))));
+                $cTypes[strtolower(trim($mparts[0]))] = preg_replace('/^"/', '', trim((string) preg_replace('/"$/', '', trim($mparts[1]))));
             } else {
                 $cTypes[] = $ppstr;
             }
@@ -306,7 +306,7 @@ class ReadmailUtility
     {
         $parts = explode('=?', $str, 2);
         if (count($parts) == 2) {
-            list($charset, $encType, $encContent) = explode('?', $parts[1], 3);
+            [$charset, $encType, $encContent] = explode('?', $parts[1], 3);
             $subparts = explode('?=', $encContent, 2);
             $encContent = $subparts[0];
             switch (strtolower($encType)) {
@@ -345,7 +345,7 @@ class ReadmailUtility
         } elseif ($reg[1] && GeneralUtility::validEmail($reg[1])) {
             $outArr['email'] = $reg[1];
             // Find name:
-            list($namePart) = explode($reg[0], $str);
+            [$namePart] = explode($reg[0], $str);
             if (trim($namePart)) {
                 $reg = '';
                 preg_match('/"([^"]*)"/', $str, $reg);
@@ -376,7 +376,7 @@ class ReadmailUtility
         $outValue['_MIME_TYPE'] = $cTypeParts[0];
         reset($cTypeParts);
         next($cTypeParts);
-        while (list(, $v) = each($cTypeParts)) {
+        foreach ($cTypeParts as $v) {
             $reg = '';
             preg_match('/([^=]*)="(.*)"/i', $v, $reg);
             if (trim($reg[1]) && trim($reg[2])) {
@@ -417,7 +417,7 @@ class ReadmailUtility
     public function getGMToffset($GMT)
     {
         $GMToffset = (int)(substr($GMT, 1, 2)) * 60 + (int)(substr($GMT, 3, 2));
-        $GMToffset *= substr($GMT, 0, 1) == '+' ? 1 : -1;
+        $GMToffset *= str_starts_with($GMT, '+') ? 1 : -1;
         $GMToffset -= $this->serverGMToffsetMinutes;
         return $GMToffset;
     }
@@ -449,7 +449,7 @@ class ReadmailUtility
             }
             // Header finished
             $parts = explode(' ', $str, 2);
-            if ($parts[0] && substr($parts[0], -1) == ':') {
+            if ($parts[0] && str_ends_with($parts[0], ':')) {
                 $p = strtolower(substr($parts[0], 0, -1));
                 if (isset($headers[$p])) {
                     $headers[$p . '.'][] = $headers[$p];
@@ -524,7 +524,7 @@ class ReadmailUtility
                     $contentSectionParts = GeneralUtility::trimExplode('--' . $mailParts['_CONTENT_TYPE_DAT']['boundary'], $mailParts['CONTENT'], 1);
                     $contentSectionParts_proc = [];
                     foreach ($contentSectionParts as $k => $v) {
-                        if (substr($v, 0, 2) == '--') {
+                        if (str_starts_with($v, '--')) {
                             break;
                         }
                         $contentSectionParts_proc[$k] = $this->fullParse($v);

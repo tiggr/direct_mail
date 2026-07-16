@@ -8,10 +8,10 @@ use TYPO3\CMS\Core\Database\Connection;
 
 class FeGroupsRepository extends MainRepository
 {
-    protected string $table                        = 'fe_groups';
-    protected string $tableFeUsers                 = 'fe_users';
-    protected string $tableSysDmailGroup           = 'sys_dmail_group';
-    protected string $tableSysDmailGroupMm         = 'sys_dmail_group_mm';
+    protected string $table = 'fe_groups';
+    protected string $tableFeUsers = 'fe_users';
+    protected string $tableSysDmailGroup = 'sys_dmail_group';
+    protected string $tableSysDmailGroupMm = 'sys_dmail_group_mm';
     protected string $tableSysDmailGroupCategoryMm = 'sys_dmail_group_category_mm';
 
     /**
@@ -116,7 +116,7 @@ class FeGroupsRepository extends MainRepository
                     $queryBuilder->quoteIdentifier($this->tableSysDmailGroupMm . '.uid_foreign')
                 ),
                 $queryBuilder->expr()->eq(
-                    $this->tableSysDmailGroupMm. '.tablenames',
+                    $this->tableSysDmailGroupMm . '.tablenames',
                     $queryBuilder->createNamedParameter($this->table)
                 )
             )
@@ -189,7 +189,7 @@ class FeGroupsRepository extends MainRepository
         // fe_groups having this id in their subgroup field
         $queryBuilder = $this->getQueryBuilder($this->table);
 
-        $queryBuilder->selectLiteral('DISTINCT ' . $this->table. '.uid')
+        $queryBuilder->selectLiteral('DISTINCT ' . $this->table . '.uid')
         ->from($this->table, $this->table)
         ->join(
             $this->table,

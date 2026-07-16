@@ -14,9 +14,9 @@ namespace DirectMailTeam\DirectMail\Scheduler;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 use DirectMailTeam\DirectMail\Dmailer;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Scheduler\Task\AbstractTask;
 
 /**
 * Class tx_directmail_scheduler
@@ -24,7 +24,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 * @author	Ivan Kartolo <ivan.kartolo@dkd.de>
 * @deprecated will be removed in TYPO3 v12.0. Use DirectmailCommand instead.
 */
-class DirectmailScheduler extends \TYPO3\CMS\Scheduler\Task\AbstractTask
+class DirectmailScheduler extends AbstractTask
 {
     /**
      * Function executed from scheduler.

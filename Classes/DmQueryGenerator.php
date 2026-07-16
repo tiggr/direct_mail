@@ -15,11 +15,15 @@ namespace DirectMailTeam\DirectMail;
  * The TYPO3 project - inspiring people to share!
  */
 
+use Doctrine\DBAL\Exception as DBALException;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
 use TYPO3\CMS\Core\Database\ConnectionPool;
+use TYPO3\CMS\Core\DataHandling\PageDoktypeRegistry;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Messaging\FlashMessageRendererResolver;
+use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Lowlevel\Controller\DatabaseIntegrityController;
 
@@ -34,14 +38,22 @@ class DmQueryGenerator extends DatabaseIntegrityController
     protected array $allowedTables = ['tt_address', 'fe_users'];
 
     public function __construct(
-        protected IconFactory $iconFactory,
-        protected readonly UriBuilder $uriBuilder,
-        protected readonly ModuleTemplateFactory $moduleTemplateFactory,
+        IconFactory $iconFactory,
+        UriBuilder $uriBuilder,
+        ModuleTemplateFactory $moduleTemplateFactory,
         protected array $settings
-    )
-    {
+    ) {
+        parent::__construct(
+            $iconFactory,
+            $uriBuilder,
+            $moduleTemplateFactory,
+            GeneralUtility::makeInstance(TcaSchemaFactory::class),
+            GeneralUtility::makeInstance(FlashMessageRendererResolver::class),
+            GeneralUtility::makeInstance(PageDoktypeRegistry::class),
+        );
     }
 
+    #[\Override]
     public function mkTableSelect(string $name, string $cur): string
     {
         $out = [];
@@ -54,7 +66,7 @@ class DmQueryGenerator extends DatabaseIntegrityController
                 if ($this->showFieldAndTableNames) {
                     $label .= ' [' . $tN . ']';
                 }
-                $out[] = '<option value="' . htmlspecialchars($tN) . '"' . ($tN == $cur ? ' selected' : '') . '>' . htmlspecialchars($label) . '</option>';
+                $out[] = '<option value="' . htmlspecialchars((string) $tN) . '"' . ($tN == $cur ? ' selected' : '') . '>' . htmlspecialchars($label) . '</option>';
             }
         }
         $out[] = '</select>';
@@ -94,7 +106,7 @@ class DmQueryGenerator extends DatabaseIntegrityController
                 $selectQueryString = $this->getSelectQuery($queryString);
                 $connection = GeneralUtility::makeInstance(ConnectionPool::class)->getConnectionForTable($this->table);
 
-                $isConnectionMysql = strpos($connection->getServerVersion(), 'MySQL') === 0;
+                $isConnectionMysql = str_starts_with($connection->getServerVersion(), 'MySQL');
                 $fullQueryString = '';
                 try {
                     $fullQueryString = $selectQueryString;
@@ -122,8 +134,8 @@ class DmQueryGenerator extends DatabaseIntegrityController
             $this->setFormName($this->formName);
         }
         try {
-            $tmpCode = $this->makeSelectorTable($this->settings, $GLOBALS['TYPO3_REQUEST'], 'query,limit');
-        } catch (\Exception $e) {
+            $tmpCode = $this->makeSelectorTable($this->settings, $GLOBALS['TYPO3_REQUEST']);
+        } catch (\Exception) {
             // silently ignore errors in query maker
         }
         if ($this->table && is_array($GLOBALS['TCA'][$this->table])) {
@@ -131,7 +143,7 @@ class DmQueryGenerator extends DatabaseIntegrityController
                 // Show query
                 $this->enablePrefix = true;
                 $queryString = $this->getQuery($this->queryConfig);
-                if($queryLimitDisabled) {
+                if ($queryLimitDisabled) {
                     $this->extFieldLists['queryLimit'] = '';
                 }
                 $selectQueryString = $this->getSelectQuery($queryString);

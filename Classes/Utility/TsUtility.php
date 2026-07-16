@@ -59,7 +59,7 @@ class TsUtility
             $set = [];
             foreach ($pageTs as $f => $v) {
                 // only get the first line of input and ignore the rest
-                $v = strtok(trim($v), "\r\n");
+                $v = strtok(trim((string) $v), "\r\n");
                 // if token is not found (false)
                 if ($v === false) {
                     // then set empty string
@@ -74,7 +74,7 @@ class TsUtility
             if (count($set)) {
                 // Get page record and TS config lines
                 $pRec = BackendUtility::getRecord('pages', $id);
-                $tsLines = explode(LF, $pRec['TSconfig'] ?: '');
+                $tsLines = explode(LF, (string) $pRec['TSconfig'] ?: '');
                 $tsLines = array_reverse($tsLines);
                 // Reset the set of changes.
                 foreach ($set as $f => $v) {

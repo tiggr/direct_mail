@@ -10,7 +10,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class SysDmailGroupRepository extends MainRepository
 {
-    protected string $table      = 'sys_dmail_group';
+    protected string $table = 'sys_dmail_group';
     protected string $tablePages = 'pages';
 
     /**

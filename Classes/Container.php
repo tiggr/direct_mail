@@ -65,7 +65,7 @@ class Container
         }
 
         // this check could probably be moved to TS
-        if ($GLOBALS['TSFE']->config['config']['insertDmailerBoundaries']) {
+        if ($GLOBALS['TYPO3_REQUEST']->getAttribute('frontend.typoscript')->getConfigArray()['insertDmailerBoundaries']) {
             if ($content != '') {
                 // setting the default
                 $categoryList = '';
@@ -104,7 +104,7 @@ class Container
         // only dummy code at the moment
         $searchString = $this->cObj->wrap('[\d,]*', $this->boundaryStartWrap);
         $content = preg_replace('/' . $searchString . '/', '', $content);
-        $content = preg_replace('/' . $this->boundaryEnd . '/', '', $content);
+        $content = preg_replace('/' . $this->boundaryEnd . '/', '', (string) $content);
         return $content;
     }
 
@@ -119,7 +119,7 @@ class Container
      */
     public function breakLines($content, array $conf)
     {
-        $linebreak = $GLOBALS['TSFE']->cObj->stdWrap(($conf['linebreak'] ? $conf['linebreak'] : chr(32) . LF), $conf['linebreak.']);
+        $linebreak = $GLOBALS['TSFE']->cObj->stdWrap(($conf['linebreak'] ?: chr(32) . LF), $conf['linebreak.']);
         $charWidth = $GLOBALS['TSFE']->cObj->stdWrap(($conf['charWidth'] ? (int)$conf['charWidth'] : 76), $conf['charWidth.']);
 
         return MailUtility::breakLinesForEmail($content, $linebreak, $charWidth);

@@ -81,12 +81,12 @@ class DirectMailUtility
      */
     public static function getURLGlue(string $url): string
     {
-        return (strpos($url, '?') !== false) ? '&' : '?';
+        return (str_contains($url, '?')) ? '&' : '?';
     }
 
     public static function prepareTypolinkParams(string $params): string
     {
-        return substr($params, 0, 1) == '&' ? substr($params, 1) : $params;
+        return str_starts_with($params, '&') ? substr($params, 1) : $params;
     }
 
     public static function getTypolinkURL(
@@ -195,10 +195,10 @@ class DirectMailUtility
             $mailContent = base64_encode(serialize($htmlmail->getParts()));
 
             $updateData = [
-                'issent'             => 0,
-                'charset'            => $htmlmail->getCharset(),
-                'mailContent'        => $mailContent,
-                'renderedSize'       => strlen($mailContent),
+                'issent' => 0,
+                'charset' => $htmlmail->getCharset(),
+                'mailContent' => $mailContent,
+                'renderedSize' => strlen($mailContent),
                 'long_link_rdct_url' => $urls['baseUrl'],
             ];
 
@@ -251,8 +251,8 @@ class DirectMailUtility
         string $messageText,
         string $messageHeader,
         ContextualFeedbackSeverity $messageType,
-        bool $storeInSession = false): FlashMessage
-    {
+        bool $storeInSession = false
+    ): FlashMessage {
         return GeneralUtility::makeInstance(
             FlashMessage::class,
             $messageText,
@@ -386,15 +386,13 @@ class DirectMailUtility
             return $message;
         }
 
-        $lengthLimit = $urlmode === 'all' ? 0 :(int)$urlmode;
+        $lengthLimit = $urlmode === 'all' ? 0 : (int)$urlmode;
         //$pattern = '/(http|https):\\/\\/.+(?=[\\]\\.\\?]*([\\! \'"()<>]+|$))/iU';
         // https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s02.html
         $pattern = '/\b((https?):\/\/|(www)\.)[-A-Z0-9+&@#\/%?=~_|$!:,.;]*[A-Z0-9+&@#\/%=~_|$]/i';
         $messageSubstituted = preg_replace_callback(
             $pattern,
-            function (array $matches) use ($rdctUtility, $lengthLimit, $index_script_url) {
-                return $rdctUtility->getRedirects()->makeRedirectUrl($matches[0], $lengthLimit, $index_script_url);
-            },
+            fn (array $matches) => $rdctUtility->getRedirects()->makeRedirectUrl($matches[0], $lengthLimit, $index_script_url),
             $message
         );
         return $messageSubstituted;

@@ -112,7 +112,7 @@ class MailFromDraft extends AbstractTask
             if ($mailRecord['mailContent'] && $mailRecord['renderedsize'] > 0) {
                 $updateData = [
                     'scheduled' => time(),
-                    'issent'    => 1,
+                    'issent' => 1,
                 ];
                 // Call a hook before enqueuing the cloned dmail record into
                 // the direct mail delivery queue

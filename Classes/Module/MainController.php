@@ -7,7 +7,7 @@ namespace DirectMailTeam\DirectMail\Module;
 use DirectMailTeam\DirectMail\Repository\PagesRepository;
 use DirectMailTeam\DirectMail\Utility\TsUtility;
 use Psr\Http\Message\ServerRequestInterface;
-use TYPO3\CMS\Backend\Attribute\Controller;
+use TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Template\ModuleTemplateFactory;
@@ -21,6 +21,7 @@ use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Http\Uri;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
+use TYPO3\CMS\Core\Imaging\IconSize;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
@@ -98,10 +99,10 @@ class MainController
 
         $this->moduleTemplate = $this->moduleTemplateFactory->create($request);
 
-        $this->id             = (int)($parsedBody['id']              ?? $queryParams['id'] ?? 0);
-        $this->cmd            = (string)($parsedBody['cmd']          ?? $queryParams['cmd'] ?? '');
-        $this->pages_uid      = (string)($parsedBody['pages_uid']    ?? $queryParams['pages_uid'] ?? '');
-        $this->sys_dmail_uid  = (int)($parsedBody['sys_dmail_uid']   ?? $queryParams['sys_dmail_uid'] ?? 0);
+        $this->id = (int)($parsedBody['id'] ?? $queryParams['id'] ?? 0);
+        $this->cmd = (string)($parsedBody['cmd'] ?? $queryParams['cmd'] ?? '');
+        $this->pages_uid = (string)($parsedBody['pages_uid'] ?? $queryParams['pages_uid'] ?? '');
+        $this->sys_dmail_uid = (int)($parsedBody['sys_dmail_uid'] ?? $queryParams['sys_dmail_uid'] ?? 0);
         $this->updatePageTree = (bool)($parsedBody['updatePageTree'] ?? $queryParams['updatePageTree'] ?? false);
 
         $this->perms_clause = $this->getBackendUser()->getPagePermsClause(Permission::PAGE_SHOW);
@@ -121,7 +122,7 @@ class MainController
         //$this->sys_language_uid = 0; //@TODO
 
         if ($this->updatePageTree) {
-            \TYPO3\CMS\Backend\Utility\BackendUtility::setUpdateSignal('updatePageTree');
+            BackendUtility::setUpdateSignal('updatePageTree');
         }
     }
 
@@ -132,10 +133,10 @@ class MainController
     protected function configureTemplatePaths(string $templateName): StandaloneView
     {
         $view = GeneralUtility::makeInstance(StandaloneView::class);
-        $view->setTemplateRootPaths(['EXT:direct_mail/Resources/Private/Templates/']);
-        $view->setPartialRootPaths(['EXT:direct_mail/Resources/Private/Partials/']);
-        $view->setLayoutRootPaths(['EXT:direct_mail/Resources/Private/Layouts/']);
-        $view->setTemplate($templateName);
+        $view->getRenderingContext()->getTemplatePaths()->setTemplateRootPaths(['EXT:direct_mail/Resources/Private/Templates/']);
+        $view->getRenderingContext()->getTemplatePaths()->setPartialRootPaths(['EXT:direct_mail/Resources/Private/Partials/']);
+        $view->getRenderingContext()->getTemplatePaths()->setLayoutRootPaths(['EXT:direct_mail/Resources/Private/Layouts/']);
+        $view->getRenderingContext()->setControllerAction($templateName);
         return $view;
     }
 
@@ -155,8 +156,8 @@ class MainController
         string $messageText,
         string $messageHeader,
         ContextualFeedbackSeverity $messageType,
-        bool $storeInSession = false): FlashMessage
-    {
+        bool $storeInSession = false
+    ): FlashMessage {
         return GeneralUtility::makeInstance(
             FlashMessage::class,
             $messageText,
@@ -283,7 +284,7 @@ class MainController
     protected function getFieldListFeUsers(): array
     {
         $fieldList = $this->getFieldList();
-        foreach(['telephone' => 'phone'] as $key => $val) {
+        foreach (['telephone' => 'phone'] as $key => $val) {
             $index = array_search($val, $fieldList);
             $fieldList[$index] = $key;
         }
@@ -303,7 +304,7 @@ class MainController
 
     protected function getIconActionsOpen(): Icon
     {
-        return $this->iconFactory->getIcon('actions-open', Icon::SIZE_SMALL);
+        return $this->iconFactory->getIcon('actions-open', IconSize::SMALL);
     }
 
     /**
@@ -321,7 +322,7 @@ class MainController
         $output = [
             'title' => $lang->sL($lllFile . ':dmail_number_records'),
             'editLinkTitle' => $lang->sL($lllFile . ':dmail_edit'),
-            'actionsOpen' => $this->iconFactory->getIcon('actions-open', Icon::SIZE_SMALL),
+            'actionsOpen' => $this->iconFactory->getIcon('actions-open', IconSize::SMALL),
             'counter' => is_array($listArr) ? count($listArr) : 0,
             'rows' => [],
         ];
@@ -362,7 +363,7 @@ class MainController
                     'icon' => $tableIcon,
                     'editLink' => $editLink,
                     'email' => $isAllowedDisplayTable ? htmlspecialchars($row['email']) : $notAllowedPlaceholder,
-                    'name' => $isAllowedDisplayTable ? htmlspecialchars($name) : '',
+                    'name' => $isAllowedDisplayTable ? htmlspecialchars((string) $name) : '',
                 ];
             }
         }
@@ -376,7 +377,7 @@ class MainController
      *
      * @param $params
      * @return Uri
-     * @throws \TYPO3\CMS\Backend\Routing\Exception\RouteNotFoundException
+     * @throws RouteNotFoundException
      */
     protected function getEditOnClickLink(array $params): Uri
     {
@@ -397,7 +398,7 @@ class MainController
         if (is_array($plainMails)) {
             $c = 0;
             foreach ($plainMails as $v) {
-                $out[$c]['email'] = trim($v);
+                $out[$c]['email'] = trim((string) $v);
                 $out[$c]['name'] = '';
                 $c++;
             }
@@ -428,7 +429,7 @@ class MainController
          * 		],
          * ];
          */
-        return array_map('unserialize', array_unique(array_map('serialize', $plainlist)));
+        return array_map(unserialize(...), array_unique(array_map(serialize(...), $plainlist)));
     }
 
     /**
@@ -443,7 +444,7 @@ class MainController
         $getLevels = 10000;
         // Finding tree and offer setting of values recursively.
         $tree = GeneralUtility::makeInstance(PageTreeView::class);
-        $tree->init(empty($perms_clause) ? ''  : 'AND ' . $perms_clause);
+        $tree->init(empty($perms_clause) ? '' : 'AND ' . $perms_clause);
         $tree->makeHTML = 0;
         $tree->setRecs = 0;
         $tree->getTree($id, $getLevels, '');
@@ -454,7 +455,7 @@ class MainController
     protected function countRecipients(array $idLists): int
     {
         $count = 0;
-        foreach(['tt_address', 'fe_users', 'PLAINLIST'] as $recipientsType) {
+        foreach (['tt_address', 'fe_users', 'PLAINLIST'] as $recipientsType) {
             if (is_array($idLists[$recipientsType] ?? false)) {
                 $count += count($idLists[$recipientsType]);
             }

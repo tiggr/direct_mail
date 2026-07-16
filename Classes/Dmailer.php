@@ -28,7 +28,6 @@ use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Mail\MailMessage;
-use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -248,24 +247,24 @@ class Dmailer implements LoggerAwareInterface
         }
 
         //$this->encoding          = $row['encoding'];
-        $this->theParts          = unserialize(base64_decode($row['mailContent']));
-        $this->messageid         = $this->theParts['messageid'];
-        $this->subject           = $this->ensureCorrectEncoding($row['subject']);
-        $this->fromEmail         = $row['from_email'];
-        $this->fromName          = $this->ensureCorrectEncoding($row['from_name']);
-        $this->replyToEmail      = $row['replyto_email'] ?? '';
-        $this->replyToName       = $this->ensureCorrectEncoding($row['replyto_name']);
-        $this->organisation      = $this->ensureCorrectEncoding($row['organisation']);
-        $this->priority          = DirectMailUtility::intInRangeWrapper((int)$row['priority'], 1, 5);
+        $this->theParts = unserialize(base64_decode($row['mailContent']));
+        $this->messageid = $this->theParts['messageid'];
+        $this->subject = $this->ensureCorrectEncoding($row['subject']);
+        $this->fromEmail = $row['from_email'];
+        $this->fromName = $this->ensureCorrectEncoding($row['from_name']);
+        $this->replyToEmail = $row['replyto_email'] ?? '';
+        $this->replyToName = $this->ensureCorrectEncoding($row['replyto_name']);
+        $this->organisation = $this->ensureCorrectEncoding($row['organisation']);
+        $this->priority = DirectMailUtility::intInRangeWrapper((int)$row['priority'], 1, 5);
         //$this->mailer            = 'TYPO3 Direct Mail module';
         $this->authCodeFieldList = $row['authcode_fieldList'] ?? '' ?: 'uid';
 
-        $this->dmailer['sectionBoundary']    = '<!--DMAILER_SECTION_BOUNDARY';
-        $this->dmailer['html_content']       = $this->theParts['html']['content'] ?? '';
-        $this->dmailer['plain_content']      = $this->theParts['plain']['content'] ?? '';
-        $this->dmailer['messageID']          = $this->theParts['messageid'];
-        $this->dmailer['sys_dmail_uid']      = $row['uid'];
-        $this->dmailer['sys_dmail_rec']      = $row;
+        $this->dmailer['sectionBoundary'] = '<!--DMAILER_SECTION_BOUNDARY';
+        $this->dmailer['html_content'] = $this->theParts['html']['content'] ?? '';
+        $this->dmailer['plain_content'] = $this->theParts['plain']['content'] ?? '';
+        $this->dmailer['messageID'] = $this->theParts['messageid'];
+        $this->dmailer['sys_dmail_uid'] = $row['uid'];
+        $this->dmailer['sys_dmail_rec'] = $row;
         $this->dmailer['boundaryParts_html'] = explode($this->dmailer['sectionBoundary'], '_END-->' . $this->dmailer['html_content']);
 
         foreach ($this->dmailer['boundaryParts_html'] as $bKey => $bContent) {
@@ -293,8 +292,8 @@ class Dmailer implements LoggerAwareInterface
             $this->dmailer['boundaryParts_plain'][$bKey] = explode('-->', $bContent, 2);
         }
 
-        $this->flagHtml     = ($this->theParts['html']['content'] ?? false) ? true : false;
-        $this->flagPlain    = ($this->theParts['plain']['content'] ?? false) ? true : false;
+        $this->flagHtml = ($this->theParts['html']['content'] ?? false) ? true : false;
+        $this->flagPlain = ($this->theParts['plain']['content'] ?? false) ? true : false;
         $this->includeMedia = $row['includeMedia'];
     }
 
@@ -308,8 +307,8 @@ class Dmailer implements LoggerAwareInterface
     protected function removeHTMLComments(string $content): string
     {
         $content = preg_replace('/\/\*<!\[CDATA\[\*\/[\t\v\n\r\f]*<!--/', '/*<![CDATA[*/', $content);
-        $content = preg_replace('/[\t\v\n\r\f]*<!(?:--[^\[\<\>][\s\S]*?--\s*)?>[\t\v\n\r\f]*/', '', $content);
-        return preg_replace('/\/\*<!\[CDATA\[\*\//', '/*<![CDATA[*/<!--', $content);
+        $content = preg_replace('/[\t\v\n\r\f]*<!(?:--[^\[\<\>][\s\S]*?--\s*)?>[\t\v\n\r\f]*/', '', (string) $content);
+        return preg_replace('/\/\*<!\[CDATA\[\*\//', '/*<![CDATA[*/<!--', (string) $content);
     }
 
     /**
@@ -325,10 +324,10 @@ class Dmailer implements LoggerAwareInterface
     {
         // Hook allows to manipulate the markers to add salutation etc.
         if (isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/direct_mail']['res/scripts/class.dmailer.php']['mailMarkersHook'])) {
-            $mailMarkersHook =& $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/direct_mail']['res/scripts/class.dmailer.php']['mailMarkersHook'];
+            $mailMarkersHook = &$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/direct_mail']['res/scripts/class.dmailer.php']['mailMarkersHook'];
             if (is_array($mailMarkersHook)) {
                 $hookParameters = [
-                    'row'     => &$recipRow,
+                    'row' => &$recipRow,
                     'markers' => &$markers,
                 ];
                 $hookReference = &$this;
@@ -355,7 +354,7 @@ class Dmailer implements LoggerAwareInterface
     public function sendAdvanced(array $recipientRow, string $tableNameChar): int
     {
         $returnCode = 0;
-        foreach($recipientRow as $key => $val) {
+        foreach ($recipientRow as $key => $val) {
             $recipientRow[$key] = is_null($val) ? $val : htmlspecialchars($val);
         }
 
@@ -365,14 +364,14 @@ class Dmailer implements LoggerAwareInterface
 
         // check if the email valids
         if (GeneralUtility::validEmail($recipientRow['email'])) {
-            $midRidId  = 'MID' . $this->dmailer['sys_dmail_uid'] . '_' . $tableNameChar . $recipientRow['uid'];
+            $midRidId = 'MID' . $this->dmailer['sys_dmail_uid'] . '_' . $tableNameChar . $recipientRow['uid'];
 
             $additionalMarkers = [
                 // Put in the tablename of the userinformation
-                '###SYS_TABLE_NAME###'      => $tableNameChar,
+                '###SYS_TABLE_NAME###' => $tableNameChar,
                 // Put in the uid of the mail-record
-                '###SYS_MAIL_ID###'         => $this->dmailer['sys_dmail_uid'],
-                '###SYS_AUTHCODE###'        => AuthCodeUtility::getHmac($recipientRow, $this->authCodeFieldList),
+                '###SYS_MAIL_ID###' => $this->dmailer['sys_dmail_uid'],
+                '###SYS_AUTHCODE###' => AuthCodeUtility::getHmac($recipientRow, $this->authCodeFieldList),
                  // Put in the unique message id in HTML-code
                 $this->dmailer['messageID'] => md5(microtime()) . '_' . $midRidId,
             ];
@@ -445,7 +444,7 @@ class Dmailer implements LoggerAwareInterface
      */
     public function sendSimple(array $recipients): bool
     {
-        $this->theParts['html']['content']  = ($this->theParts['html']['content'] ?? false) ? $this->getBoundaryParts($this->dmailer['boundaryParts_html'], -1) : '';
+        $this->theParts['html']['content'] = ($this->theParts['html']['content'] ?? false) ? $this->getBoundaryParts($this->dmailer['boundaryParts_html'], -1) : '';
         $this->theParts['plain']['content'] = ($this->theParts['plain']['content'] ?? false) ? $this->getBoundaryParts($this->dmailer['boundaryParts_plain'], -1) : '';
 
         foreach ($recipients as $recipient) {
@@ -474,7 +473,7 @@ class Dmailer implements LoggerAwareInterface
         foreach ($cArray as $bKey => $cP) {
             $key = substr($cP[0], 1);
             $isSubscribed = false;
-            $cP['mediaList'] = $cP['mediaList'] ?? '';
+            $cP['mediaList'] ??= '';
             if (!$key || ((int)$userCategories == -1)) {
                 $returnVal .= $cP[1];
                 //$this->mediaList .= $cP['mediaList'];
@@ -555,17 +554,11 @@ class Dmailer implements LoggerAwareInterface
                 if (is_array($listArr)) {
                     $ct = 0;
                     // Find tKey
-                    switch ($table) {
-                        case 'tt_address':
-                        case 'fe_users':
-                            $tKey = substr($table, 0, 1);
-                            break;
-                        case 'PLAINLIST':
-                            $tKey = 'P';
-                            break;
-                        default:
-                            $tKey = 'u';
-                    }
+                    $tKey = match ($table) {
+                        'tt_address', 'fe_users' => substr($table, 0, 1),
+                        'PLAINLIST' => 'P',
+                        default => 'u',
+                    };
 
                     // Send mails
                     $sendIds = GeneralUtility::makeInstance(SysDmailMaillogRepository::class)->dmailerGetSentMails((int)$mid, $tKey);
@@ -771,10 +764,10 @@ class Dmailer implements LoggerAwareInterface
             if (!$row['scheduled_begin']) {
                 // Hook to alter the list of recipients
                 if (isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/direct_mail']['res/scripts/class.dmailer.php']['queryInfoHook'])) {
-                    $queryInfoHook =& $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/direct_mail']['res/scripts/class.dmailer.php']['queryInfoHook'];
+                    $queryInfoHook = &$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/direct_mail']['res/scripts/class.dmailer.php']['queryInfoHook'];
                     if (is_array($queryInfoHook)) {
                         $hookParameters = [
-                            'row'    => $row,
+                            'row' => $row,
                             'query_info' => &$query_info,
                         ];
                         $hookReference = &$this;
@@ -874,7 +867,7 @@ class Dmailer implements LoggerAwareInterface
         }
     }
 
-    protected function sendTheMail(Address $recipient, array $recipientRow = null): void
+    protected function sendTheMail(Address $recipient, ?array $recipientRow = null): void
     {
         /** @var MailMessage $mailer */
         $mailer = GeneralUtility::makeInstance(MailMessage::class);
@@ -910,10 +903,10 @@ class Dmailer implements LoggerAwareInterface
 
         // Hook to edit or add the mail headers
         if (isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/direct_mail']['res/scripts/class.dmailer.php']['mailHeadersHook'])) {
-            $mailHeadersHook =& $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/direct_mail']['res/scripts/class.dmailer.php']['mailHeadersHook'];
+            $mailHeadersHook = &$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['ext/direct_mail']['res/scripts/class.dmailer.php']['mailHeadersHook'];
             if (is_array($mailHeadersHook)) {
                 $hookParameters = [
-                    'row'    => &$recipientRow,
+                    'row' => &$recipientRow,
                     'header' => &$header,
                 ];
                 $hookReference = &$this;
@@ -1059,7 +1052,7 @@ class Dmailer implements LoggerAwareInterface
             '/http[s]?:\/\/\S+/',
             function ($urlMatches) use (&$jumpUrlCounter) {
                 $url = $urlMatches[0];
-                if (strpos($url, '&no_jumpurl=1') !== false) {
+                if (str_contains($url, '&no_jumpurl=1')) {
                     // A link parameter "&no_jumpurl=1" allows to disable jumpurl for plain text links
                     $url = str_replace('&no_jumpurl=1', '', $url);
                 } elseif ($this->jumperURLUseId) {
@@ -1107,12 +1100,12 @@ class Dmailer implements LoggerAwareInterface
         $imageList = '';
 
         // split the document by the beginning of the above tags
-        $codepieces = preg_split($attribRegex, $htmlContent);
+        $codepieces = preg_split($attribRegex, (string) $htmlContent);
         $len = strlen($codepieces[0]);
         $pieces = count($codepieces);
         $reg = [];
         for ($i = 1; $i < $pieces; $i++) {
-            $tag = strtolower(strtok(substr($htmlContent, $len + 1, 10), ' '));
+            $tag = strtolower(strtok(substr((string) $htmlContent, $len + 1, 10), ' '));
             $len += strlen($tag) + strlen($codepieces[$i]) + 2;
             preg_match('/[^>]*/', $codepieces[$i], $reg);
 
@@ -1124,7 +1117,7 @@ class Dmailer implements LoggerAwareInterface
             $imageData['ref'] = ($attributes['src'] ?? $attributes['background'] ?? '');
             if ($imageData['ref']) {
                 // find out if the value had quotes around it
-                $imageData['quotes'] = (substr($codepieces[$i], strpos($codepieces[$i], $imageData['ref']) - 1, 1) == '"') ? '"' : '';
+                $imageData['quotes'] = (substr($codepieces[$i], strpos($codepieces[$i], (string) $imageData['ref']) - 1, 1) == '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
                 if ($imageData['ref'] && !strstr($imageList, '|' . $imageData['subst_str'] . '|')) {
@@ -1141,7 +1134,7 @@ class Dmailer implements LoggerAwareInterface
         // Extracting stylesheets
         $attribRegex = $this->tag_regex(['link']);
         // Split the document by the beginning of the above tags
-        $codepieces = preg_split($attribRegex, $htmlContent);
+        $codepieces = preg_split($attribRegex, (string) $htmlContent);
         $pieces = count($codepieces);
         for ($i = 1; $i < $pieces; $i++) {
             preg_match('/[^>]*/', $codepieces[$i], $reg);
@@ -1152,7 +1145,7 @@ class Dmailer implements LoggerAwareInterface
                 // Finds the src or background attribute
                 $imageData['ref'] = $attributes['href'];
                 // Finds out if the value had quotes around it
-                $imageData['quotes'] = (substr($codepieces[$i], strpos($codepieces[$i], $imageData['ref']) - 1, 1) == '"') ? '"' : '';
+                $imageData['quotes'] = (substr($codepieces[$i], strpos($codepieces[$i], (string) $imageData['ref']) - 1, 1) == '"') ? '"' : '';
                 // subst_str is the string to look for, when substituting lateron
                 $imageData['subst_str'] = $imageData['quotes'] . $imageData['ref'] . $imageData['quotes'];
                 if ($imageData['ref'] && !strstr($imageList, '|' . $imageData['subst_str'] . '|')) {
@@ -1164,7 +1157,7 @@ class Dmailer implements LoggerAwareInterface
         }
 
         // fixes javascript rollovers
-        $codepieces = explode('.src', $htmlContent);
+        $codepieces = explode('.src', (string) $htmlContent);
         $pieces = count($codepieces);
         $expr = '/^[^' . quotemeta('"') . quotemeta("'") . ']*/';
         for ($i = 1; $i < $pieces; $i++) {
@@ -1198,11 +1191,11 @@ class Dmailer implements LoggerAwareInterface
         $attribRegex = $this->tag_regex(['a', 'form', 'area']);
 
         // Splits the document by the beginning of the above tags
-        $codepieces = preg_split($attribRegex, $htmlContent);
+        $codepieces = preg_split($attribRegex, (string) $htmlContent);
         $len = strlen($codepieces[0]);
         $pieces = count($codepieces);
         for ($i = 1; $i < $pieces; $i++) {
-            $tag = strtolower(strtok(substr($htmlContent, $len + 1, 10), ' '));
+            $tag = strtolower(strtok(substr((string) $htmlContent, $len + 1, 10), ' '));
             $len += strlen($tag) + strlen($codepieces[$i]) + 2;
 
             preg_match('/[^>]*/', $codepieces[$i], $reg);
@@ -1210,14 +1203,14 @@ class Dmailer implements LoggerAwareInterface
             $attributes = $this->get_tag_attributes($reg[0], false);
             $hrefData = [];
             $hrefData['ref'] = ($attributes['href'] ?? '') ?: ($attributes['action'] ?? '');
-            $quotes = (substr($hrefData['ref'], 0, 1) === '"') ? '"' : '';
+            $quotes = (str_starts_with($hrefData['ref'], '"')) ? '"' : '';
             $hrefData['ref'] = trim($hrefData['ref'], '"');
             if ($hrefData['ref']) {
                 // Finds out if the value had quotes around it
                 $hrefData['quotes'] = $quotes;
                 // subst_str is the string to look for when substituting later on
                 $hrefData['subst_str'] = $quotes . $hrefData['ref'] . $quotes;
-                if ($hrefData['ref'] && substr(trim($hrefData['ref']), 0, 1) != '#' && !strstr($linkList, '|' . $hrefData['subst_str'] . '|')) {
+                if ($hrefData['ref'] && !str_starts_with(trim($hrefData['ref']), '#') && !strstr($linkList, '|' . $hrefData['subst_str'] . '|')) {
                     $linkList .= '|' . $hrefData['subst_str'] . '|';
                     $hrefData['absRef'] = $this->absRef($hrefData['ref']);
                     $hrefData['tag'] = $tag;
@@ -1227,7 +1220,7 @@ class Dmailer implements LoggerAwareInterface
             }
         }
         // Extracts TYPO3 specific links made by the openPic() JS function
-        $codepieces = explode("onClick=\"openPic('", $htmlContent);
+        $codepieces = explode("onClick=\"openPic('", (string) $htmlContent);
         $pieces = count($codepieces);
         for ($i = 1; $i < $pieces; $i++) {
             $showpicArray = explode("'", $codepieces[$i]);
@@ -1266,7 +1259,7 @@ class Dmailer implements LoggerAwareInterface
         if (strpos(' ' . $htmlCode, '<frame ')) {
             $attribRegex = $this->tag_regex(['frame']);
             // Splits the document by the beginning of the above tags
-            $codepieces = preg_split($attribRegex, $htmlCode, 1000000);
+            $codepieces = preg_split($attribRegex, (string) $htmlCode, 1000000);
             $pieces = count($codepieces);
             for ($i = 1; $i < $pieces; $i++) {
                 preg_match('/[^>]*/', $codepieces[$i], $reg);
@@ -1320,7 +1313,7 @@ class Dmailer implements LoggerAwareInterface
     protected function get_tag_attributes(string $tag, bool $removeQuotes = true): array
     {
         $attributes = [];
-        $tag = ltrim(preg_replace('/^<[^ ]*/', '', trim($tag)));
+        $tag = ltrim((string) preg_replace('/^<[^ ]*/', '', trim($tag)));
         $tagLen = strlen($tag);
         $safetyCounter = 100;
         // Find attribute
@@ -1330,9 +1323,9 @@ class Dmailer implements LoggerAwareInterface
             $attrib = $reg[0];
 
             $tag = ltrim(substr($tag, strlen($attrib), $tagLen));
-            if (substr($tag, 0, 1) === '=') {
+            if (str_starts_with($tag, '=')) {
                 $tag = ltrim(substr($tag, 1, $tagLen));
-                if (substr($tag, 0, 1) === '"' && $removeQuotes) {
+                if (str_starts_with($tag, '"') && $removeQuotes) {
                     // Quotes around the value
                     $reg = explode('"', substr($tag, 1, $tagLen), 2);
                     $tag = ltrim($reg[1]);
@@ -1342,7 +1335,7 @@ class Dmailer implements LoggerAwareInterface
                     preg_match('/^([^[:space:]>]*)(.*)/', $tag, $reg);
                     $value = trim($reg[1]);
                     $tag = ltrim($reg[2]);
-                    if (substr($tag, 0, 1) === '>') {
+                    if (str_starts_with($tag, '>')) {
                         $tag = '';
                     }
                 }
@@ -1378,7 +1371,7 @@ class Dmailer implements LoggerAwareInterface
         } else {
             // If the reference is relative, the path is added,
             // in order for us to fetch the content
-            if (substr($this->theParts['html']['path'], -1) == '/') {
+            if (str_ends_with($this->theParts['html']['path'], '/')) {
                 // if the last char is a /, then prepend the ref
                 $ref = $this->theParts['html']['path'] . $ref;
             } else {

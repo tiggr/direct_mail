@@ -14,11 +14,12 @@ namespace DirectMailTeam\DirectMail\Scheduler;
  *
  * The TYPO3 project - inspiring people to share!
  */
-
 use DirectMailTeam\DirectMail\Repository\SysDmailMaillogRepository;
 use DirectMailTeam\DirectMail\Utility\ReadmailUtility;
+use Doctrine\DBAL\DBALException;
 use Fetch\Message;
 use Fetch\Server;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -255,9 +256,9 @@ class AnalyzeBounceMail extends AbstractTask
                     'return_code' => (int)$cp['reason'],
                 ];
                 $connection->insert('sys_dmail_maillog', $insertFields);
-                $sql_insert_id = $connection->lastInsertId('sys_dmail_maillog');
+                $sql_insert_id = $connection->lastInsertId();
                 return (bool)$sql_insert_id;
-            } catch (\Doctrine\DBAL\DBALException $e) {
+            } catch (DBALException) {
                 // Log $e->getMessage();
                 return false;
             }
@@ -289,7 +290,7 @@ class AnalyzeBounceMail extends AbstractTask
         try {
             $imapStream = $mailServer->getImapStream();
             return $mailServer;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         }
     }
@@ -300,6 +301,6 @@ class AnalyzeBounceMail extends AbstractTask
      */
     private function getEXEC_TIME()
     {
-        return $GLOBALS['EXEC_TIME'];
+        return GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('date', 'timestamp');
     }
 }
