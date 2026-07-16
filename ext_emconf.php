@@ -1,6 +1,6 @@
 <?php
 
-$EM_CONF[$_EXTKEY] = [
+$EM_CONF['direct_mail'] = [
     'title' => 'Direct Mail',
     'description' => 'Advanced Direct Mail/Newsletter mailer system with sophisticated options for personalization of emails including response statistics.',
     'category' => 'module',
@@ -8,7 +8,7 @@ $EM_CONF[$_EXTKEY] = [
     'author_email' => 'ivan.kartolo@dkd.de',
     'author_company' => 'd.k.d Internet Service GmbH',
     'state' => 'alpha',
-    'version' => '10.0.0',
+    'version' => '13.4.0',
     'constraints' => [
         'depends' => [
             'typo3' => '12.4.0-13.4.99',
