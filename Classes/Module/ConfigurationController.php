@@ -72,8 +72,6 @@ final class ConfigurationController extends MainController
 
     public function indexAction(ModuleTemplate $view): ResponseInterface
     {
-        // Load JavaScript via PageRenderer
-        $this->pageRenderer->loadRequireJs();
         $this->pageRenderer->loadJavaScriptModule('@directmailteam/directmail/Configuration.js');
         if (($this->id && $this->access) || ($this->isAdmin() && !$this->id)) {
             $module = $this->getModulName();
